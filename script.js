@@ -1,7 +1,7 @@
 const ballCount = 5;
 const clink = 'clink';
-let lineX = 240;
-let canvas, stage, tweens, activeCount, text;
+let ballX = 240;
+let canvas, stage, tweens, activeCount, text, frontlineX, backlineX, backlineY, lineEnd;
 
 const init = () => {
 	canvas = document.getElementById('testCanvas');
@@ -15,33 +15,77 @@ const init = () => {
 
 	stage.addChild(text);
 
+	const backFrame = new createjs.Shape();
+	backFrame.graphics.beginFill("#555")
+		.moveTo(-72, 390).lineTo(-45, 347).lineTo(615, 347).lineTo(637, 390)
+		.beginFill('#777').drawRoundRectComplex(0, 0, 15, 355, 10, 0, 3, 3)
+		.drawRoundRectComplex(0, 0, 570, 15, 10, 10, 0, 0)
+		.drawRoundRectComplex(555, 0, 15, 355, 0, 10, 3, 3);
+	backFrame.x = 115;
+	backFrame.y = 155;
+
+	stage.addChild(backFrame);
+
 	for (let i = 0; i < ballCount; i++) {
 		const ball = new createjs.Shape();
-		ball.graphics.beginFill('#555')
-			.drawRect(0, 0, 2, 300)
-			.beginLinearGradientFill(['#FFF', '#999'], [0.8, 1], -20, 180, 20, 320).drawCircle(0, 300, 40);
-		ball.x = lineX;
-		ball.y = 150;
 
-		if (i === 0 || i === ballCount -1) {
-			tweens.push({ref: ball});
+		switch (true) {
+			case i === 0:
+				frontlineX = 10;
+				backlineX = 10;
+				backlineY = 35;
+				lineEnd = 2;
+				tweens.push({ref: ball});
+				break;
+			case i === 1:
+				frontlineX = 5;
+				backlineX = 5;
+				backlineY = 35;
+				break;
+			case i === 3:
+				frontlineX = -5;
+				backlineX = -5;
+				backlineY = 35;
+				break;
+			case i === ballCount - 1:
+				frontlineX = -10;
+				backlineX = -10;
+				backlineY = 35;
+				tweens.push({ref: ball});
+				break;
+			default:
+				frontlineX = 0;
+				backlineX = 0;
+				backlineY = 0;
 		}
+
+		ball.graphics.setStrokeStyle(2)
+			.beginStroke('#aaa')
+			.moveTo(-frontlineX, 20)
+			.lineTo(0, 300)
+			.beginStroke('#777')
+			.moveTo(backlineX, backlineY)
+			.lineTo(0, 300)
+			.endStroke()
+			.beginLinearGradientFill(['#FFF', '#999'], [0.8, 1], -20, 180, 20, 320).drawCircle(0, 300, 40);
+		ball.x = ballX;
+		ball.y = 130;
 
 		stage.addChild(ball);
 
-		lineX += 80;
+		ballX += 80;
 	}
 
-	const frame = new createjs.Shape();
-	frame.graphics.beginFill('#777')
-		.drawRoundRectComplex(0, 0, 20, 400, 10, 0, 0, 0)
+	const frontFrame = new createjs.Shape();
+	frontFrame.graphics.beginFill('#999')
+		.drawRoundRectComplex(0, 0, 20, 405, 10, 0, 5, 5)
 		.drawRoundRectComplex(0, 0, 615, 20, 10, 10, 0, 0)
-		.drawRoundRectComplex(600, 0, 20, 400, 0, 10, 0, 0)
-		.beginFill('#444').drawRoundRectComplex(-50, 400, 715, 20, 10, 10, 0, 0);
-	frame.x = 90;
-	frame.y = 130;
+		.drawRoundRectComplex(600, 0, 20, 405, 0, 10, 5, 5)
+		.beginFill('#444').drawRoundRectComplex(-50, 410, 715, 20, 10, 10, 0, 0);
+	frontFrame.x = 90;
+	frontFrame.y = 130;
 
-	stage.addChild(frame);
+	stage.addChild(frontFrame);
 
 	activeCount = ballCount;
 	stage.addEventListener('stagemouseup', startNewtonsCradle);
@@ -70,9 +114,7 @@ const startNewtonsCradle = event => {
 		.to({rotation: -40}, 400)
 		.wait(100)
 		.to({rotation: 0, rotationDir: 0}, 150)
-		.call(playClink);;
-
-
+		.call(playClink);
 }
 
 const tick = event => {
