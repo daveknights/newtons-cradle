@@ -1,10 +1,12 @@
 const ballCount = 5;
+const clink = 'clink';
 let lineX = 240;
 let canvas, stage, tweens, activeCount, text;
 
 const init = () => {
 	canvas = document.getElementById('testCanvas');
 	stage = new createjs.Stage(canvas);
+	createjs.Sound.registerSound("clink.mp3", clink);
 	tweens = [];
 
 	text = new createjs.Text('Click to start', '36px Arial', '#028a78');
@@ -47,6 +49,8 @@ const init = () => {
 	createjs.Ticker.addEventListener('tick', tick);
 }
 
+const playClink = () => createjs.Sound.play(clink);
+
 const startNewtonsCradle = event => {
 	stage.removeEventListener('stagemouseup', startNewtonsCradle);
 	stage.removeChild(text);
@@ -58,13 +62,17 @@ const startNewtonsCradle = event => {
 		.to({rotation: 40}, 400)
 		.wait(100)
 		.to({rotation: 0, rotationDir: 0}, 150)
+		.call(playClink)
 		.wait(700);
 
 	createjs.Tween.get(lastBall, {loop: -1})
 		.wait(700)
 		.to({rotation: -40}, 400)
 		.wait(100)
-		.to({rotation: 0, rotationDir: 0}, 150);
+		.to({rotation: 0, rotationDir: 0}, 150)
+		.call(playClink);;
+
+
 }
 
 const tick = event => {
