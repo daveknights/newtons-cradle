@@ -81,6 +81,12 @@ const tick = event => {
 	}
 }
 
+const loadSound = () => {
+  const preload = new createjs.LoadQueue();
+  preload.addEventListener("fileload", init);
+  preload.loadFile("clink.mp3");
+}
+
 window.addEventListener('load', () => {
-	init();
+	loadSound();
 });
